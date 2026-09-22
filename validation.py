@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class Config(BaseModel) -> None:
+class Validation(BaseModel) -> None:
     WIDTH: int
     HEIGHT: int
     ENTRY: tuple
