@@ -2,6 +2,7 @@ CONFIG = config.txt
 MAIN = a_maze_ing.py
 
 install:
+    pip install -r requirements.txt
 
 run:
 	python3 ${MAIN} ${CONFIG}
