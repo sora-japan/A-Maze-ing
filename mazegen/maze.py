@@ -11,6 +11,13 @@ DIRECTION_BITS = {
     'W': 3,
 }
 
+DIRECTION_DELTAS = {
+    'N': (0, -1),
+    'E': (1, 0),
+    'S': (0, 1),
+    'W': (-1, 0),
+}
+
 @dataclass
 class Maze:
     """各マスの壁を4bitで持つ、長方形の迷路の盤面。
@@ -53,12 +60,37 @@ class Maze:
 
         Returns:
             壁が閉じていれば True、開いていれば False。
+
+        Raises:
+            ValueError: 座標が迷路の範囲外の場合。
         """
+        if not self.range_judge(coordinates):
+            raise ValueError(f'座標が範囲外です: {coordinates}')
         x, y = coordinates
         grid_num = self.grid[y][x]
         bit = DIRECTION_BITS[direction]
         mask = 1 << bit
         return (grid_num & mask) != 0
+    def neighbor(
+        self, coordinates: tuple[int, int], direction: str
+    ) -> tuple[int, int]:
+        """指定したマスから、指定した方向に1マス進んだ先の座標を返す。
+
+        範囲の判定はしないため、盤面の外の座標を返すことがある。
+        使う側で range_judge を呼び、範囲内かを確かめること。
+
+        Args:
+            coordinates: 元のマスの座標 (x, y)。
+            direction: 進む方向。'N'、'E'、'S'、'W' のいずれか。
+
+        Returns:
+            隣のマスの座標 (x, y)。
+        """
+        x, y = coordinates
+        dx, dy = DIRECTION_DELTAS[direction]
+        new_coordinates = (x + dx, y + dy)
+        return new_coordinates
+
 
 
         # if bit[0] == 1:
@@ -83,11 +115,18 @@ if __name__ == '__main__':
     result = maze.range_judge((0, 0))
     print(result)
     print(maze.grid)
+    print('===has_wallメソッドの確認===')
     bit = 1 << 3
     print(bit)
     print(0b1000)
-
-
+    print(maze.has_wall((0, 0), 'N'))
+    print(maze.has_wall((2, 0), 'N'))
+    # print(maze.has_wall((0, -1), 'N'))
+    print('===neighborメソッドの確認===')
+    print(maze.neighbor((1, 1), 'N'))
+    print(maze.neighbor((1, 1), 'E'))
+    print(maze.neighbor((1, 1), 'S'))
+    print(maze.neighbor((1, 1), 'W'))
 
 # [
 #     [1, 1, 1, 1, 1, 1, 1],
